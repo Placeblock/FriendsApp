@@ -1,37 +1,44 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
-import * as SplashScreen from 'expo-splash-screen';
-import { useEffect } from 'react';
-import 'react-native-reanimated';
+import { Stack } from 'expo-router/stack';
+import { SQLiteDatabase, SQLiteProvider } from 'expo-sqlite';
+import { Suspense } from 'react';
+import { Text, View } from 'react-native';
+import * as SystemUI from 'expo-system-ui';
 
-import { useColorScheme } from '@/hooks/useColorScheme';
+SystemUI.setBackgroundColorAsync("black");
 
-// Prevent the splash screen from auto-hiding before asset loading is complete.
-SplashScreen.preventAutoHideAsync();
+export default function Layout() {
+    return <Suspense fallback={<Text>Loading</Text>}>
+        <SQLiteProvider databaseName='friends' onInit={migrateDbIfNeeded}>
+            <Stack screenOptions={{
+                    contentStyle: {padding: 20, backgroundColor: "#0d0d0d"}, 
+                    headerStyle: {backgroundColor: "#5522ff"},
+                    headerTintColor: "white"
+                }}>
+                <Stack.Screen name="index" options={{ headerTitle: "Freunde" }} />
+                <Stack.Screen name="[id]" />
+            </Stack>
+        </SQLiteProvider>
+    </Suspense>;
+}
 
-export default function RootLayout() {
-  const colorScheme = useColorScheme();
-  const [loaded] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
-  });
-
-  useEffect(() => {
-    if (loaded) {
-      SplashScreen.hideAsync();
-    }
-  }, [loaded]);
-
-  if (!loaded) {
-    return null;
-  }
-
-  return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="+not-found" />
-      </Stack>
-    </ThemeProvider>
-  );
+async function migrateDbIfNeeded(db: SQLiteDatabase) {
+    await db.execAsync(`
+        PRAGMA foreign_keys = ON;
+        CREATE TABLE IF NOT EXISTS friends (
+            id INTEGER PRIMARY KEY NOT NULL,
+            name VARCHAR(64) NOT NULL UNIQUE
+        );
+        CREATE TABLE IF NOT EXISTS attributes (
+            id INTEGER PRIMARY KEY NOT NULL,
+            name VARCHAR(64) NOT NULL UNIQUE
+        );
+        CREATE TABLE IF NOT EXISTS friend_attributes (
+            id INTEGER PRIMARY KEY NOT NULL,
+            friend_id INTEGER NOT NULL,
+            attribute_id INTEGER NOT NULL,
+            value VARCHAR NOT NULL,
+            FOREIGN KEY(friend_id) REFERENCES friends(id) ON DELETE CASCADE,
+            FOREIGN KEY(attribute_id) REFERENCES attributes(id) ON DELETE CASCADE
+        );
+    `)
 }

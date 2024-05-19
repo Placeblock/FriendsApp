@@ -1,3 +1,8 @@
+# FriendsApp
+
+I always found it anoying to keep track of what my friends like and love.
+This is why I created the Friends App.
+
 # Welcome to your Expo app 👋
 
 This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).

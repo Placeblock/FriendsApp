@@ -1,6 +1,6 @@
 import { useLocalSearchParams, useNavigation } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
-import { FlatList, StyleSheet, View } from 'react-native';
+import { FlatList, ScrollView, StyleSheet, View } from 'react-native';
 import * as SQLite from 'expo-sqlite';
 import { Attribute, Attributes, Friend, FriendAttribute } from '@/constants/Types';
 import {default as FriendAttrib} from '@/components/FriendAttribute';
@@ -76,10 +76,10 @@ export default function Page() {
     return <View style={{flex:  1}}>
         <SearchInput onSearch={updateQuery}/>
         <View style={{borderBottomColor: "white", borderBottomWidth: StyleSheet.hairlineWidth, marginVertical: 20}}></View>
-        <FlatList contentContainerStyle={{gap: 15}} data={filteredItems} renderItem={({ item }) =>
-            <FriendAttrib key={item[0].id} friendID={Number(id)} id={item[0].id} 
-                name={item[0].name} defaultValues={item[1]} onDelete={() => requestDeleteAttribute(item[0].id)}/>
-        } />
+        <ScrollView>
+            {filteredItems.map(item => <FriendAttrib key={item[0].id} friendID={Number(id)} id={item[0].id} 
+                name={item[0].name} defaultValues={item[1]} onDelete={() => requestDeleteAttribute(item[0].id)}/>)}
+        </ScrollView>
         <AddButton onAdd={showAddAttribute}/>
         <AddAttributeModal visible={showAddAttributeModal} onClose={hideAddAttribute} onAdd={handleNewAttribute}/>
         <ConfirmModal visible={showDeleteAttributeModal} 

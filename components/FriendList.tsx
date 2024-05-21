@@ -1,6 +1,6 @@
 import { Friend } from "@/constants/Types";
 import { useSearchBar } from "@/hooks/useSearchBar";
-import { FlatList, StyleSheet, Text, TouchableHighlight, View } from "react-native";
+import { FlatList, ScrollView, StyleSheet, Text, TouchableHighlight, View } from "react-native";
 import SearchInput from "./SearchInput";
 import { Link } from "expo-router";
 import { faTrashCan } from "@fortawesome/free-solid-svg-icons/faTrashCan";
@@ -14,14 +14,14 @@ export default function FriendList({friends, onDelete}: {friends: Friend[], onDe
         <View style={styles.list}>
             <SearchInput onSearch={updateQuery}/>
             <View style={{borderBottomColor: "white", borderBottomWidth: StyleSheet.hairlineWidth, marginVertical: 20}}></View>
-            <FlatList style={{width: "100%"}} data={filteredItems} renderItem={({ item }) =>
-                <View style={{flexDirection: "row", justifyContent: "space-between", alignItems: "center"}}>
+            <ScrollView style={{width: "100%"}}>
+                {filteredItems.map(item => <View key={item.id} style={{flexDirection: "row", justifyContent: "space-between", alignItems: "center"}}>
                     <Link key={item.id} style={styles.link} href={{ pathname: "[id]", params: { id: item.id.toString() } }}>{item.name}</Link>
                     <TouchableHighlight style={styles.deleteBtn} onPress={() => onDelete(item.id)}>
                         <Text><FontAwesomeIcon icon={faTrashCan} color='#ff2525' size={12}/></Text>
                     </TouchableHighlight>
-                </View>
-            } />
+                </View>)}
+            </ScrollView>
         </View>
     )
 }

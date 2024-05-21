@@ -32,7 +32,7 @@ export default function FriendAttribute({friendID, id, name, defaultValues, onDe
         setValues(values => values.filter(v => v.id != id));
     }
 
-    return <View>
+    return <View style={{marginBottom: 10}}>
         <View style={{flex: 1, flexDirection: "row", justifyContent: "space-between"}}>
             <Text style={styles.attributeTitle}>{name}</Text>
             <View style={{flexDirection: "row"}}>
